@@ -65,7 +65,10 @@ func openNote(relativeWeek int, config Config) {
 	}
 	//Open the file
 	cmd := exec.Command(config.Editor, notePath)
-	err = cmd.Start()
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	err = cmd.Run()
+
 	if err != nil {
 		fmt.Println("Error running command:", err)
 		return
