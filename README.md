@@ -1,6 +1,7 @@
 # note-cli
 Simple CLI tool to manage weekly notes.
 
+![demo screencast](.github/cli-demo.gif)
 
 ## Install
 ```
