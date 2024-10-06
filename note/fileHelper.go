@@ -7,8 +7,20 @@ import (
 	"strings"
 )
 
-func WriteFile(path string, bytes []byte) error {
-	cleanedPath, err := AppendHomeDirectory(path)
+type FileHelper interface {
+	WriteFile(path string, bytes []byte) error
+	ReadFile(path string) ([]byte, error)
+	FileExists(path string) (bool, error)
+	AppendHomeDirectory(filePath string) (string, error)
+}
+type fileHelper struct{}
+
+func NewFileHelper() FileHelper {
+	return &fileHelper{}
+}
+
+func (fileHelper fileHelper) WriteFile(path string, bytes []byte) error {
+	cleanedPath, err := fileHelper.AppendHomeDirectory(path)
 	if err != nil {
 		fmt.Println("Error appending home directory to: "+path, err)
 		return err
@@ -37,8 +49,8 @@ func WriteFile(path string, bytes []byte) error {
 	return nil
 }
 
-func ReadFile(path string) ([]byte, error) {
-	cleanedPath, err := AppendHomeDirectory(path)
+func (fileHelper fileHelper) ReadFile(path string) ([]byte, error) {
+	cleanedPath, err := fileHelper.AppendHomeDirectory(path)
 	if err != nil {
 		fmt.Println("Error appending home directory to: "+path, err)
 		return nil, err
@@ -52,8 +64,8 @@ func ReadFile(path string) ([]byte, error) {
 	return data, nil
 }
 
-func FileExists(path string) (bool, error) {
-	cleanedPath, err := AppendHomeDirectory(path)
+func (fileHelper fileHelper) FileExists(path string) (bool, error) {
+	cleanedPath, err := fileHelper.AppendHomeDirectory(path)
 	if err != nil {
 		fmt.Println("Error appending home directory to: "+path, err)
 		return false, err
@@ -68,7 +80,7 @@ func FileExists(path string) (bool, error) {
 	return true, nil
 }
 
-func AppendHomeDirectory(filePath string) (string, error) {
+func (fileHelper fileHelper) AppendHomeDirectory(filePath string) (string, error) {
 	if strings.HasPrefix(filePath, "~/") {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
