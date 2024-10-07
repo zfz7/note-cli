@@ -71,6 +71,9 @@ func (configHelper configHelper) WriteDefaultConfig() error {
 func (configHelper configHelper) ReadConfig() (NoteConfig, error) {
 	config := NoteConfig{}
 	data, err := configHelper.fileHelper.ReadFile(ConfigPath)
+	if err != nil {
+		return config, err
+	}
 	err = json.Unmarshal(data, &config)
 	if err != nil {
 		defaultConfig, _ := json.Marshal(config)
@@ -85,7 +88,6 @@ func (configHelper configHelper) ReadRelativeWeek() (int, error) {
 	if len(os.Args) == 2 {
 		i, err := strconv.Atoi(os.Args[1])
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Could not convert: "+os.Args[1]+" to int")
 			return 0, err
 		}
 		relativeWeek = i

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/urfave/cli/v2"
+	"log"
 	"os"
 )
 
@@ -9,30 +11,57 @@ func main() {
 	fileHelper := NewFileHelper()
 	configHelper := NewConfigHelper(fileHelper)
 	noteHelper := NewNoteHelper(fileHelper)
-	if len(os.Args) != 1 && len(os.Args) != 2 {
-		fmt.Println("Invalid number of arguments, accept 0 or 1")
-		os.Exit(1)
+	app := &cli.App{
+		Name:    "note",
+		Usage:   "Simple cli tool to help create notes from a template file and open notes from previous weeks.",
+		Version: "v0.0.1",
+		Commands: []*cli.Command{
+			{
+				Name:    "setup",
+				Aliases: []string{"s"},
+				Usage:   "Setup notes cli config",
+				Action: func(cCtx *cli.Context) error {
+					err := configHelper.WriteDefaultConfig()
+					if err != nil {
+						fmt.Println("Error writing config")
+						cli.Exit("Error writing config", 1)
+					}
+					return nil
+				},
+			},
+			{
+				Name:    "open",
+				Aliases: []string{"o"},
+				Usage:   "Open existing note or create new note from template",
+				Flags: []cli.Flag{
+					&cli.IntFlag{
+						Name:        "index",
+						Usage:       "Index to open previous or next weeks notes",
+						Aliases:     []string{"i"},
+						DefaultText: "0",
+					},
+				},
+				Action: func(cCtx *cli.Context) error {
+					relativeWeek := cCtx.Int("index")
+					config, err := configHelper.ReadConfig()
+					if err != nil {
+						fmt.Println("Missing config, please run 'note setup'")
+						cli.Exit("Missing config, please run 'note setup'", 1)
+						return err
+					}
+					err = noteHelper.OpenNote(relativeWeek, config)
+					if err != nil {
+						fmt.Println("Could not open note, check files exist or permissions")
+						cli.Exit("Could not open note, check files exist or permissions", 1)
+						return err
+					}
+					return nil
+				},
+			},
+		},
 	}
 
-	if len(os.Args) == 2 && os.Args[1] == "setup" {
-		err := configHelper.WriteDefaultConfig()
-		if err != nil {
-			os.Exit(1)
-		}
-		os.Exit(0)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
-
-	relativeWeek, err := configHelper.ReadRelativeWeek()
-	if err != nil {
-		os.Exit(1)
-	}
-	config, err := configHelper.ReadConfig()
-	if err != nil {
-		os.Exit(1)
-	}
-	err = noteHelper.OpenNote(relativeWeek, config)
-	if err != nil {
-		os.Exit(1)
-	}
-	os.Exit(0)
 }
