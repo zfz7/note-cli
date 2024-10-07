@@ -1,2 +1,2 @@
 # note-cli
-CLI tool to manage notes
+CLI tool to manage notes 

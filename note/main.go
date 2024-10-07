@@ -35,14 +35,14 @@ func main() {
 				Usage:   "Open existing note or create new note from template",
 				Flags: []cli.Flag{
 					&cli.IntFlag{
-						Name:        "index",
+						Name:        "time",
 						Usage:       "Index to open previous or next weeks notes",
-						Aliases:     []string{"i"},
+						Aliases:     []string{"t"},
 						DefaultText: "0",
 					},
 				},
 				Action: func(cCtx *cli.Context) error {
-					relativeWeek := cCtx.Int("index")
+					relativeWeek := cCtx.Int("time")
 					config, err := configHelper.ReadConfig()
 					if err != nil {
 						fmt.Println("Missing config, please run 'note setup'")
