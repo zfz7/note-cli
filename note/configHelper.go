@@ -48,7 +48,7 @@ var defaultConfig = NoteConfig{
 }
 
 func (configHelper configHelper) WriteDefaultConfig() error {
-	bytes, _ := json.Marshal(defaultConfig)
+	bytes, _ := json.MarshalIndent(defaultConfig, "", "  ")
 	err := configHelper.fileHelper.WriteFile(ConfigPath, bytes)
 	if err != nil {
 		fmt.Println("Error writing default config: "+string(bytes), err)
