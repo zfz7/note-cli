@@ -4,14 +4,11 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"os"
-	"strconv"
 )
 
 type ConfigHelper interface {
 	WriteDefaultConfig() error
 	ReadConfig() (NoteConfig, error)
-	ReadRelativeWeek() (int, error)
 }
 
 type configHelper struct {
@@ -82,16 +79,4 @@ func (configHelper configHelper) ReadConfig() (NoteConfig, error) {
 		return config, err
 	}
 	return config, nil
-}
-
-func (configHelper configHelper) ReadRelativeWeek() (int, error) {
-	relativeWeek := 0
-	if len(os.Args) == 2 {
-		i, err := strconv.Atoi(os.Args[1])
-		if err != nil {
-			return 0, err
-		}
-		relativeWeek = i
-	}
-	return relativeWeek, nil
 }
