@@ -19,9 +19,9 @@ func main() {
 			{
 				Name:    "setup",
 				Aliases: []string{"s"},
-				Usage:   "Setup notes cli config",
+				Usage:   "Writes default config, if exists opens it",
 				Action: func(cCtx *cli.Context) error {
-					err := configHelper.WriteDefaultConfig()
+					err := configHelper.Setup()
 					if err != nil {
 						fmt.Println("Error writing config")
 						cli.Exit("Error writing config", 1)

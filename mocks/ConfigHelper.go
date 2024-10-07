@@ -42,7 +42,7 @@ func (_m *ConfigHelper) WriteDefaultConfig() error {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for WriteDefaultConfig")
+		panic("no return value specified for Setup")
 	}
 
 	var r0 error

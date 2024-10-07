@@ -4,10 +4,12 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"os"
+	"os/exec"
 )
 
 type ConfigHelper interface {
-	WriteDefaultConfig() error
+	Setup() error
 	ReadConfig() (NoteConfig, error)
 }
 
@@ -44,26 +46,48 @@ var defaultConfig = NoteConfig{
 	Extension: DefaultExtension,
 }
 
-func (configHelper configHelper) WriteDefaultConfig() error {
+func (configHelper configHelper) Setup() error {
+	config, err := configHelper.ReadConfig()
+	if err != nil { //Config file does not exist
+		config, err = configHelper.writeDefaultConfig()
+		if err != nil {
+			return err
+		}
+	}
+
+	//Open the file
+	cleandConfigPath, err := configHelper.fileHelper.AppendHomeDirectory(ConfigPath)
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command(config.Editor, cleandConfigPath)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	err = cmd.Run()
+
+	return nil
+}
+
+func (configHelper configHelper) writeDefaultConfig() (NoteConfig, error) {
 	bytes, _ := json.MarshalIndent(defaultConfig, "", "  ")
 	err := configHelper.fileHelper.WriteFile(ConfigPath, bytes)
 	if err != nil {
 		fmt.Println("Error writing default config: "+string(bytes), err)
-		return err
+		return NoteConfig{}, err
 	}
 
 	staticTemplate, err := staticFiles.ReadFile("static/template.md")
 	if err != nil {
 		fmt.Println("Error reading default template:", err)
-		return err
+		return NoteConfig{}, err
 	}
 	err = configHelper.fileHelper.WriteFile(defaultConfig.Template, staticTemplate)
 	if err != nil {
 		fmt.Println("Error writing default template: "+string(bytes), err)
-		return err
+		return NoteConfig{}, err
 	}
 	fmt.Println("Default config written to " + ConfigPath + " to change config manually update config.json")
-	return nil
+	return defaultConfig, nil
 }
 
 func (configHelper configHelper) ReadConfig() (NoteConfig, error) {
