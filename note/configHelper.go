@@ -65,6 +65,7 @@ func (configHelper configHelper) WriteDefaultConfig() error {
 		fmt.Println("Error writing default template: "+string(bytes), err)
 		return err
 	}
+	fmt.Println("Default config written to " + ConfigPath + " to change config manually update config.json")
 	return nil
 }
 
