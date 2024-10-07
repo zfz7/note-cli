@@ -73,7 +73,7 @@ func Test_configHelper_ReadConfig(t *testing.T) {
 	}
 }
 
-func Test_configHelper_Setup(t *testing.T) {
+func Test_configHelper_Config(t *testing.T) {
 	config, _ := json.MarshalIndent(defaultConfig, "", "  ")
 	missingFileHelper := &mocks.FileHelper{}
 	missingFileHelper.On("ReadFile", ConfigPath).Return(nil, errors.New("missing file"))
@@ -121,8 +121,8 @@ func Test_configHelper_Setup(t *testing.T) {
 			configHelper := configHelper{
 				fileHelper: tt.fields.fileHelper,
 			}
-			if err := configHelper.Setup(); (err != nil) != tt.wantErr {
-				t.Errorf("Setup() error = %v, wantErr %v", err, tt.wantErr)
+			if err := configHelper.Config(); (err != nil) != tt.wantErr {
+				t.Errorf("Config() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			tt.AssertCallBack()
 		})

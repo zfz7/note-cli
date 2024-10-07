@@ -17,11 +17,11 @@ func main() {
 		Version: "v0.0.1",
 		Commands: []*cli.Command{
 			{
-				Name:    "setup",
-				Aliases: []string{"s"},
+				Name:    "config",
+				Aliases: []string{"c"},
 				Usage:   "Writes default config, if exists opens it",
 				Action: func(cCtx *cli.Context) error {
-					err := configHelper.Setup()
+					err := configHelper.Config()
 					if err != nil {
 						fmt.Println("Error writing config")
 						cli.Exit("Error writing config", 1)

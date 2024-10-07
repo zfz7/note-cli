@@ -42,7 +42,7 @@ func (_m *ConfigHelper) Setup() error {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Setup")
+		panic("no return value specified for Config")
 	}
 
 	var r0 error

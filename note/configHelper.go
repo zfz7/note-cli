@@ -7,7 +7,7 @@ import (
 )
 
 type ConfigHelper interface {
-	Setup() error
+	Config() error
 	ReadConfig() (NoteConfig, error)
 }
 
@@ -44,7 +44,7 @@ var defaultConfig = NoteConfig{
 	Extension: DefaultExtension,
 }
 
-func (configHelper configHelper) Setup() error {
+func (configHelper configHelper) Config() error {
 	config, err := configHelper.ReadConfig()
 	if err != nil { //Config file does not exist
 		config, err = configHelper.writeDefaultConfig()
