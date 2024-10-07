@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"time"
 )
+
+var Now = time.Now
 
 type NoteHelper interface {
 	OpenNote(relativeWeek int, config NoteConfig) error
@@ -22,7 +22,7 @@ func NewNoteHelper(fileHelper FileHelper) NoteHelper {
 }
 
 func (noteHelper noteHelper) OpenNote(relativeWeek int, config NoteConfig) error {
-	now := time.Now()
+	now := Now()
 	//Find monday then add relative week
 	daysToSubtract := ((int(now.Weekday()) + 6) % 7) + -relativeWeek*7
 	monday := now.AddDate(0, 0, -daysToSubtract)
@@ -41,14 +41,8 @@ func (noteHelper noteHelper) OpenNote(relativeWeek int, config NoteConfig) error
 			fmt.Printf("Error creating new note")
 		}
 	}
-	//Open the file
-	cmd := exec.Command(config.Editor, notePath)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	err = cmd.Run()
-
+	err = noteHelper.fileHelper.EditorOpenFile(config.Editor, notePath)
 	if err != nil {
-		fmt.Println("Error running command:", err)
 		return err
 	}
 	return nil

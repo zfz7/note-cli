@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -11,8 +13,23 @@ type FileHelper interface {
 	ReadFile(path string) ([]byte, error)
 	FileExists(path string) (bool, error)
 	AppendHomeDirectory(filePath string) (string, error)
+	EditorOpenFile(editor string, filePath string) error
 }
 type fileHelper struct{}
+
+func (fileHelper fileHelper) EditorOpenFile(editor string, filePath string) error {
+	//Open the file
+	cmd := exec.Command(editor, filePath)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	err := cmd.Run()
+
+	if err != nil {
+		fmt.Println("Error running command:", err)
+		return err
+	}
+	return nil
+}
 
 func NewFileHelper() FileHelper {
 	return &fileHelper{}

@@ -37,6 +37,24 @@ func (_m *FileHelper) AppendHomeDirectory(filePath string) (string, error) {
 	return r0, r1
 }
 
+// EditorOpenFile provides a mock function with given fields: editor, filePath
+func (_m *FileHelper) EditorOpenFile(editor string, filePath string) error {
+	ret := _m.Called(editor, filePath)
+
+	if len(ret) == 0 {
+		panic("no return value specified for EditorOpenFile")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(editor, filePath)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // FileExists provides a mock function with given fields: path
 func (_m *FileHelper) FileExists(path string) (bool, error) {
 	ret := _m.Called(path)

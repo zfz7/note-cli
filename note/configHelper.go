@@ -4,8 +4,6 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"os"
-	"os/exec"
 )
 
 type ConfigHelper interface {
@@ -60,11 +58,11 @@ func (configHelper configHelper) Setup() error {
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command(config.Editor, cleandConfigPath)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	err = cmd.Run()
 
+	err = configHelper.fileHelper.EditorOpenFile(config.Editor, cleandConfigPath)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

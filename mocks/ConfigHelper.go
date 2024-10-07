@@ -37,8 +37,8 @@ func (_m *ConfigHelper) ReadConfig() (NoteConfig, error) {
 	return r0, r1
 }
 
-// WriteDefaultConfig provides a mock function with given fields:
-func (_m *ConfigHelper) WriteDefaultConfig() error {
+// Setup provides a mock function with given fields:
+func (_m *ConfigHelper) Setup() error {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
