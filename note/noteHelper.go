@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
 var Now = time.Now
 
 type NoteHelper interface {
-	OpenNote(relativeWeek int, config NoteConfig) error
+	OpenNote(relativeInterval int, config NoteConfig) error
 }
 
 type noteHelper struct {
@@ -21,12 +22,9 @@ func NewNoteHelper(fileHelper FileHelper) NoteHelper {
 	}
 }
 
-func (noteHelper noteHelper) OpenNote(relativeWeek int, config NoteConfig) error {
-	now := Now()
-	//Find monday then add relative week
-	daysToSubtract := ((int(now.Weekday()) + 6) % 7) + -relativeWeek*7
-	monday := now.AddDate(0, 0, -daysToSubtract)
-	noteName := monday.Format("2006-01-02") + "." + config.Extension
+func (noteHelper noteHelper) OpenNote(relativeInterval int, config NoteConfig) error {
+	noteDate := noteHelper.getNoteDate(relativeInterval, config)
+	noteName := noteDate.Format("2006-01-02") + "." + config.Extension
 	notePath, _ := noteHelper.fileHelper.AppendHomeDirectory(config.Location + "/" + noteName)
 	noteExists, err := noteHelper.fileHelper.FileExists(notePath)
 
@@ -46,6 +44,25 @@ func (noteHelper noteHelper) OpenNote(relativeWeek int, config NoteConfig) error
 		return err
 	}
 	return nil
+}
+
+func (noteHelper noteHelper) getNoteDate(relativeInterval int, config NoteConfig) time.Time {
+	now := Now()
+	if strings.ToLower(config.Interval) == "day" {
+		return now.AddDate(0, 0, relativeInterval)
+	}
+	if strings.ToLower(config.Interval) == "week" {
+		//Find monday then add relative week
+		daysToSubtract := ((int(now.Weekday()) + 6) % 7) + -relativeInterval*7
+		monday := now.AddDate(0, 0, -daysToSubtract)
+		return monday
+	}
+	if strings.ToLower(config.Interval) == "month" {
+		//Find first of month then add relative month
+		month := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+		return month.AddDate(0, relativeInterval, 0)
+	}
+	return now
 }
 
 func (noteHelper noteHelper) createNewNote(notePath string, err error, config NoteConfig) error {

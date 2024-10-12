@@ -29,6 +29,7 @@ type NoteConfig struct {
 	Location  string `json:"location"`
 	Template  string `json:"template"`
 	Extension string `json:"extension"`
+	Interval  string `json:"interval"`
 }
 
 const ConfigPath = "~/.config/note/config.json"
@@ -36,12 +37,14 @@ const DefaultTemplate = "~/.config/note/template.md"
 const DefaultLocation = "~/notes"
 const DefaultEditor = "vim"
 const DefaultExtension = "md"
+const DefaultInterval = "week"
 
 var defaultConfig = NoteConfig{
 	Editor:    DefaultEditor,
 	Location:  DefaultLocation,
 	Template:  DefaultTemplate,
 	Extension: DefaultExtension,
+	Interval:  DefaultInterval,
 }
 
 func (configHelper configHelper) Config() error {

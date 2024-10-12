@@ -14,7 +14,7 @@ func main() {
 	app := &cli.App{
 		Name:    "note",
 		Usage:   "Simple cli tool to help create notes from a template file and open notes from previous weeks.",
-		Version: "v0.0.1",
+		Version: "v0.0.2",
 		Commands: []*cli.Command{
 			{
 				Name:    "config",
@@ -35,21 +35,21 @@ func main() {
 				Usage:   "Open existing note or create new note from template",
 				Flags: []cli.Flag{
 					&cli.IntFlag{
-						Name:        "time",
-						Usage:       "Index to open previous or next weeks notes",
-						Aliases:     []string{"t"},
+						Name:        "interval",
+						Usage:       "Relative interval to open previous or next interval's notes",
+						Aliases:     []string{"i"},
 						DefaultText: "0",
 					},
 				},
 				Action: func(cCtx *cli.Context) error {
-					relativeWeek := cCtx.Int("time")
+					relativeInterval := cCtx.Int("interval")
 					config, err := configHelper.ReadConfig()
 					if err != nil {
-						fmt.Println("Missing config, please run 'note setup'")
-						cli.Exit("Missing config, please run 'note setup'", 1)
+						fmt.Println("Missing config, please run 'note config'")
+						cli.Exit("Missing config, please run 'note config'", 1)
 						return err
 					}
-					err = noteHelper.OpenNote(relativeWeek, config)
+					err = noteHelper.OpenNote(relativeInterval, config)
 					if err != nil {
 						fmt.Println("Could not open note, check files exist or permissions")
 						cli.Exit("Could not open note, check files exist or permissions", 1)

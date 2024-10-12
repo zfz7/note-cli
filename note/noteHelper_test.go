@@ -9,7 +9,7 @@ import (
 
 func Test_noteHelper_OpenNote(t *testing.T) {
 	Now = func() time.Time {
-		return time.Date(2022, time.October, 1, 10, 0, 0, 0, time.UTC)
+		return time.Date(2022, time.October, 1, 10, 15, 10, 0, time.UTC)
 	}
 	defer func() { Now = time.Now }()
 	noteExistsHelper := &mocks.FileHelper{}
@@ -28,13 +28,26 @@ func Test_noteHelper_OpenNote(t *testing.T) {
 	})
 	noteMissingHelper.On("EditorOpenFile", mock.Anything, mock.Anything).Return(nil)
 	noteMissingHelper.On("WriteFile", mock.Anything, mock.Anything).Return(nil)
-
+	dayConfig := NoteConfig{
+		Editor:    defaultConfig.Editor,
+		Location:  defaultConfig.Location,
+		Template:  defaultConfig.Template,
+		Extension: defaultConfig.Extension,
+		Interval:  "day",
+	}
+	monthConfig := NoteConfig{
+		Editor:    defaultConfig.Editor,
+		Location:  defaultConfig.Location,
+		Template:  defaultConfig.Template,
+		Extension: defaultConfig.Extension,
+		Interval:  "MONTH",
+	}
 	type fields struct {
 		fileHelper FileHelper
 	}
 	type args struct {
-		relativeWeek int
-		config       NoteConfig
+		relativeInterval int
+		config           NoteConfig
 	}
 	tests := []struct {
 		name           string
@@ -44,36 +57,90 @@ func Test_noteHelper_OpenNote(t *testing.T) {
 		AssertCallBack func()
 	}{
 		{
-			name:    "Note exists, relativeWeek: 0",
+			name:    "Note exists, relativeInterval: 0, interval: week",
 			fields:  fields{fileHelper: noteExistsHelper},
-			args:    args{relativeWeek: 0, config: defaultConfig},
+			args:    args{relativeInterval: 0, config: defaultConfig},
 			wantErr: false,
 			AssertCallBack: func() {
 				noteExistsHelper.AssertCalled(t, "EditorOpenFile", defaultConfig.Editor, "~/notes/2022-09-26."+defaultConfig.Extension)
 			},
 		},
 		{
-			name:    "Note exists, relativeWeek: 1",
+			name:    "Note exists, relativeInterval: 1, interval: week",
 			fields:  fields{fileHelper: noteExistsHelper},
-			args:    args{relativeWeek: 1, config: defaultConfig},
+			args:    args{relativeInterval: 1, config: defaultConfig},
 			wantErr: false,
 			AssertCallBack: func() {
 				noteExistsHelper.AssertCalled(t, "EditorOpenFile", defaultConfig.Editor, "~/notes/2022-10-03."+defaultConfig.Extension)
 			},
 		},
 		{
-			name:    "Note exists, relativeWeek: -1",
+			name:    "Note exists, relativeInterval: -1, interval: week",
 			fields:  fields{fileHelper: noteExistsHelper},
-			args:    args{relativeWeek: -1, config: defaultConfig},
+			args:    args{relativeInterval: -1, config: defaultConfig},
 			wantErr: false,
 			AssertCallBack: func() {
 				noteExistsHelper.AssertCalled(t, "EditorOpenFile", defaultConfig.Editor, "~/notes/2022-09-19."+defaultConfig.Extension)
 			},
 		},
 		{
-			name:    "Note exists, relativeWeek: 0",
+			name:    "Note exists, relativeInterval: 0, interval: day",
+			fields:  fields{fileHelper: noteExistsHelper},
+			args:    args{relativeInterval: 0, config: dayConfig},
+			wantErr: false,
+			AssertCallBack: func() {
+				noteExistsHelper.AssertCalled(t, "EditorOpenFile", dayConfig.Editor, "~/notes/2022-10-01."+dayConfig.Extension)
+			},
+		},
+		{
+			name:    "Note exists, relativeInterval: 1, interval: day",
+			fields:  fields{fileHelper: noteExistsHelper},
+			args:    args{relativeInterval: 1, config: dayConfig},
+			wantErr: false,
+			AssertCallBack: func() {
+				noteExistsHelper.AssertCalled(t, "EditorOpenFile", dayConfig.Editor, "~/notes/2022-10-02."+dayConfig.Extension)
+			},
+		},
+		{
+			name:    "Note exists, relativeInterval: -1, interval: day",
+			fields:  fields{fileHelper: noteExistsHelper},
+			args:    args{relativeInterval: -1, config: dayConfig},
+			wantErr: false,
+			AssertCallBack: func() {
+				noteExistsHelper.AssertCalled(t, "EditorOpenFile", dayConfig.Editor, "~/notes/2022-09-30."+dayConfig.Extension)
+			},
+		},
+		{
+			name:    "Note exists, relativeInterval: 0, interval: month",
+			fields:  fields{fileHelper: noteExistsHelper},
+			args:    args{relativeInterval: 0, config: monthConfig},
+			wantErr: false,
+			AssertCallBack: func() {
+				noteExistsHelper.AssertCalled(t, "EditorOpenFile", monthConfig.Editor, "~/notes/2022-10-01."+monthConfig.Extension)
+			},
+		},
+		{
+			name:    "Note exists, relativeInterval: 1, interval: month",
+			fields:  fields{fileHelper: noteExistsHelper},
+			args:    args{relativeInterval: 1, config: monthConfig},
+			wantErr: false,
+			AssertCallBack: func() {
+				noteExistsHelper.AssertCalled(t, "EditorOpenFile", monthConfig.Editor, "~/notes/2022-11-01."+monthConfig.Extension)
+			},
+		},
+		{
+			name:    "Note exists, relativeInterval: -1, interval: month",
+			fields:  fields{fileHelper: noteExistsHelper},
+			args:    args{relativeInterval: -1, config: monthConfig},
+			wantErr: false,
+			AssertCallBack: func() {
+				noteExistsHelper.AssertCalled(t, "EditorOpenFile", dayConfig.Editor, "~/notes/2022-09-01."+dayConfig.Extension)
+			},
+		},
+		{
+			name:    "Note does not exists, relativeInterval: 0, interval: week",
 			fields:  fields{fileHelper: noteMissingHelper},
-			args:    args{relativeWeek: 0, config: defaultConfig},
+			args:    args{relativeInterval: 0, config: defaultConfig},
 			wantErr: false,
 			AssertCallBack: func() {
 				noteMissingHelper.AssertCalled(t, "WriteFile", defaultConfig.Location+"/2022-09-26."+defaultConfig.Extension, mock.Anything)
@@ -81,9 +148,9 @@ func Test_noteHelper_OpenNote(t *testing.T) {
 			},
 		},
 		{
-			name:    "Note exists, relativeWeek: 1",
+			name:    "Note does not exists, relativeInterval: 1, interval: week",
 			fields:  fields{fileHelper: noteMissingHelper},
-			args:    args{relativeWeek: 1, config: defaultConfig},
+			args:    args{relativeInterval: 1, config: defaultConfig},
 			wantErr: false,
 			AssertCallBack: func() {
 				noteMissingHelper.AssertCalled(t, "WriteFile", defaultConfig.Location+"/2022-10-03."+defaultConfig.Extension, mock.Anything)
@@ -96,7 +163,7 @@ func Test_noteHelper_OpenNote(t *testing.T) {
 			noteHelper := noteHelper{
 				fileHelper: tt.fields.fileHelper,
 			}
-			if err := noteHelper.OpenNote(tt.args.relativeWeek, tt.args.config); (err != nil) != tt.wantErr {
+			if err := noteHelper.OpenNote(tt.args.relativeInterval, tt.args.config); (err != nil) != tt.wantErr {
 				t.Errorf("OpenNote() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			tt.AssertCallBack()
