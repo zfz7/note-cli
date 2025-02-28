@@ -163,8 +163,8 @@ func Test_noteHelper_OpenNote(t *testing.T) {
 			noteHelper := noteHelper{
 				fileHelper: tt.fields.fileHelper,
 			}
-			if err := noteHelper.OpenNote(tt.args.relativeInterval, tt.args.config); (err != nil) != tt.wantErr {
-				t.Errorf("OpenNote() error = %v, wantErr %v", err, tt.wantErr)
+			if err := noteHelper.OpenNoteByInterval(tt.args.relativeInterval, tt.args.config); (err != nil) != tt.wantErr {
+				t.Errorf("OpenNoteByInterval() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			tt.AssertCallBack()
 		})

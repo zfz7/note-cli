@@ -9,7 +9,8 @@ import (
 var Now = time.Now
 
 type NoteHelper interface {
-	OpenNote(relativeInterval int, config NoteConfig) error
+	OpenNoteByInterval(relativeInterval int, config NoteConfig) error
+	OpenNoteByFileName(file string, config NoteConfig) error
 }
 
 type noteHelper struct {
@@ -22,9 +23,18 @@ func NewNoteHelper(fileHelper FileHelper) NoteHelper {
 	}
 }
 
-func (noteHelper noteHelper) OpenNote(relativeInterval int, config NoteConfig) error {
+func (noteHelper noteHelper) OpenNoteByInterval(relativeInterval int, config NoteConfig) error {
 	noteDate := noteHelper.getNoteDate(relativeInterval, config)
 	noteName := noteDate.Format("2006-01-02") + "." + config.Extension
+	return openNote(noteName, config, noteHelper)
+}
+
+func (noteHelper noteHelper) OpenNoteByFileName(file string, config NoteConfig) error {
+	noteName := file + "." + config.Extension
+	return openNote(noteName, config, noteHelper)
+}
+
+func openNote(noteName string, config NoteConfig, noteHelper noteHelper) error {
 	notePath, _ := noteHelper.fileHelper.AppendHomeDirectory(config.Location + "/" + noteName)
 	noteExists, err := noteHelper.fileHelper.FileExists(notePath)
 

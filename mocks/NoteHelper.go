@@ -14,7 +14,7 @@ func (_m *NoteHelper) OpenNote(relativeWeek int, config NoteConfig) error {
 	ret := _m.Called(relativeWeek, config)
 
 	if len(ret) == 0 {
-		panic("no return value specified for OpenNote")
+		panic("no return value specified for OpenNoteByInterval")
 	}
 
 	var r0 error

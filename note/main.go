@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/urfave/cli/v2"
 	"log"
@@ -40,16 +41,32 @@ func main() {
 						Aliases:     []string{"i"},
 						DefaultText: "0",
 					},
+					&cli.StringFlag{
+						Name:    "file",
+						Usage:   "Open note by file name",
+						Aliases: []string{"f"},
+					},
 				},
 				Action: func(cCtx *cli.Context) error {
+					if cCtx.String("interval") == "" && cCtx.String("file") == "" {
+						fmt.Println("flags --interval and --file cannot both be set")
+						cli.Exit("flags --interval and --file cannot both be set", 1)
+						return errors.New("flags --interval and --file cannot both be set")
+					}
+
 					relativeInterval := cCtx.Int("interval")
+					file := cCtx.String("file")
 					config, err := configHelper.ReadConfig()
 					if err != nil {
 						fmt.Println("Missing config, please run 'note config'")
 						cli.Exit("Missing config, please run 'note config'", 1)
 						return err
 					}
-					err = noteHelper.OpenNote(relativeInterval, config)
+					if file != "" {
+						err = noteHelper.OpenNoteByFileName(file, config)
+					} else {
+						err = noteHelper.OpenNoteByInterval(relativeInterval, config)
+					}
 					if err != nil {
 						fmt.Println("Could not open note, check files exist or permissions")
 						cli.Exit("Could not open note, check files exist or permissions", 1)
